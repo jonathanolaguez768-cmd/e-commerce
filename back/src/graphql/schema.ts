@@ -113,4 +113,8 @@ export const typeDefs = `#graphql
       input: CrearPedidoInput!
     ): Pedido!
   }
+
+  type Subscription {
+    pedidoCreado: Pedido!
+  }
 `
