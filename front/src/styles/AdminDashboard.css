@@ -3,9 +3,9 @@ html, body {
   padding: 0;
   background-color: #07090e;
   background-image: 
-    radial-gradient(circle at 15% 20%, rgba(0, 98, 255, 0.25) 0%, transparent 45%),
-    radial-gradient(circle at 85% 75%, rgba(159, 82, 15, 0.2) 0%, transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(0, 98, 255, 0.1) 0%, transparent 60%);
+    radial-gradient(circle at 15% 20%, rgba(220, 226, 235, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(247, 243, 239, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(240, 242, 245, 0.197) 0%, transparent 60%);
   width: 100%;
   overflow-x: hidden;
 }
@@ -186,7 +186,7 @@ html, body {
   flex: 1;
   margin-top: 30px;
   background-color: transparent; 
-  color: #F47F26;
+  color: #f5f4f3;
   border: 2px solid #F47F26;
   border-radius: 6px;
   padding: 0.9rem;
@@ -282,7 +282,7 @@ html, body {
 
 .btn-edit {
   background-color: transparent;
-  color: #F47F26;
+  color: #fffdfb;
   border: 1px solid #F47F26;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
@@ -301,7 +301,7 @@ html, body {
 
 .btn-delete {
   background-color: transparent;
-  color: #ef4444;
+  color: #fffcfc;
   border: 1px solid #dc2626;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
