@@ -291,3 +291,8 @@ bun add -d @types/ws
 bun add graphql-ws ws @hono/node-server
 bun add -d @types/ws
 ```
+
+## /front
+```
+npm install @apollo/client graphql graphql-ws
+```

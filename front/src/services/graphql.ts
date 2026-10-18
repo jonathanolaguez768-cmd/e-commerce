@@ -3,7 +3,6 @@ import type { Category } from '../types/category'
 import type { Order } from '../types/order'
 import type { Product } from '../types/product'
 
-
 export async function fetchGraphQL<T>(
   query: string,
   variables?: Record<string, unknown>,

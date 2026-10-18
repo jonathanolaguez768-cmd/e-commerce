@@ -300,10 +300,16 @@ Subscription: {
 
     Usuario: {
         pedidos: async (
-            usuario: { id: number },
+            _: unknown,
+            __: unknown,
+            context: GraphQLContext,
         ) => {
-            const { rows } = await db.query(
-                `
+            if (!context.user) {
+                throw new Error('Unauthenticated')
+            }
+            const isAdmin = context.user.rol === 'ADMIN';
+
+            let query = `
                 SELECT
                     id,
                     TO_CHAR(
@@ -314,14 +320,17 @@ Subscription: {
                     status,
                     usuario_id
                 FROM pedido
-                WHERE usuario_id = $1
-                ORDER BY fecha DESC
-                `,
-                [usuario.id],
-            )
+            `;
+            const params: any[] = [];
 
-            return rows
-        },
+            if (!isAdmin) {
+                query += ` WHERE usuario_id = $1`;
+                params.push(context.user.id);
+            }
+            query += ` ORDER BY fecha DESC`;
+            const { rows } = await db.query(query, params);
+            return rows;
+        }
     },
 
     Pedido: {
