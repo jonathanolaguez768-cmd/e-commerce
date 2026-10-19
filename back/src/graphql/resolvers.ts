@@ -6,12 +6,23 @@ import {
 } from '../validation/schemas'
 
 import type { SessionUser } from '../auth/session'
-
+import { pubsub, PEDIDO_CREADO } from './pubsub'
 interface GraphQLContext {
     user: SessionUser | null
 }
 
 export const resolvers = {
+Subscription: {
+        pedidoCreado: {
+            subscribe: (_: unknown, __: unknown, context: GraphQLContext) => {
+                if (!context.user) {
+                    throw new Error('No autenticado para esta suscripción');
+                }       
+                return (pubsub as any).asyncIterator([PEDIDO_CREADO]);
+            },
+        }
+    },
+
     Query: {
         categorias: async () => {
             const { rows } = await db.query(
@@ -289,10 +300,16 @@ export const resolvers = {
 
     Usuario: {
         pedidos: async (
-            usuario: { id: number },
+            _: unknown,
+            __: unknown,
+            context: GraphQLContext,
         ) => {
-            const { rows } = await db.query(
-                `
+            if (!context.user) {
+                throw new Error('Unauthenticated')
+            }
+            const isAdmin = context.user.rol === 'ADMIN';
+
+            let query = `
                 SELECT
                     id,
                     TO_CHAR(
@@ -303,14 +320,17 @@ export const resolvers = {
                     status,
                     usuario_id
                 FROM pedido
-                WHERE usuario_id = $1
-                ORDER BY fecha DESC
-                `,
-                [usuario.id],
-            )
+            `;
+            const params: any[] = [];
 
-            return rows
-        },
+            if (!isAdmin) {
+                query += ` WHERE usuario_id = $1`;
+                params.push(context.user.id);
+            }
+            query += ` ORDER BY fecha DESC`;
+            const { rows } = await db.query(query, params);
+            return rows;
+        }
     },
 
     Pedido: {
@@ -660,6 +680,7 @@ export const resolvers = {
                     }[]
                 }
             },
+            context: GraphQLContext
         ) => {
             const input = createOrderSchema.parse(args.input)
 
@@ -820,8 +841,9 @@ export const resolvers = {
                     status: string
                     usuario_id: number
                 }[]
-
-                return orders[0]
+                const nuevoPedido = orders[0];
+                pubsub.publish(PEDIDO_CREADO, { pedidoCreado: nuevoPedido });
+            return nuevoPedido;
             } catch (error) {
                 await client.query('ROLLBACK')
                 throw error

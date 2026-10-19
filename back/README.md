@@ -279,3 +279,20 @@ El backend permite:
 * Utilizar transacciones para los pedidos.
 * Consultar productos mediante paginación por cursor.
 * Resolver relaciones entre las entidades mediante GraphQL.
+
+## subscriptions
+```bash
+bun add graphql-subscriptions
+```
+### websockets
+```bash
+bun add graphql-ws ws @hono/node-server
+bun add -d @types/ws
+bun add graphql-ws ws @hono/node-server
+bun add -d @types/ws
+```
+
+## /front
+```
+npm install @apollo/client graphql graphql-ws
+```

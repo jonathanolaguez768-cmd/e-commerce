@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useCartStore } from "../store/cartStore";
 import { API_URL } from "../config";
+import { useCartStore } from "../store/cartStore";
 
 declare global {
     interface Window {

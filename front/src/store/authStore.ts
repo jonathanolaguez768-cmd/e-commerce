@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-
+import { useCartStore } from './cartStore'
 export type AuthUser = {
   id: number
   nombre: string
@@ -16,5 +16,8 @@ type AuthStore = {
 export const useAuthStore = create<AuthStore>()((set) => ({
   user: null,
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
+ clearUser: () => {
+    useCartStore.getState().clearCart()
+    set({ user: null })
+  },
 }))
