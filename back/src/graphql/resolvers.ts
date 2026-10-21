@@ -6,19 +6,19 @@ import {
 } from '../validation/schemas'
 
 import type { SessionUser } from '../auth/session'
-import { pubsub, PEDIDO_CREADO } from './pubsub'
+import { PEDIDO_CREADO, pubsub } from './pubsub'
 interface GraphQLContext {
     user: SessionUser | null
 }
 
 export const resolvers = {
-Subscription: {
+    Subscription: {
         pedidoCreado: {
             subscribe: (_: unknown, __: unknown, context: GraphQLContext) => {
                 if (!context.user) {
                     throw new Error('No autenticado para esta suscripción');
-                }       
-                return (pubsub as any).asyncIterator([PEDIDO_CREADO]);
+                }
+                return pubsub.asyncIterableIterator([PEDIDO_CREADO]);
             },
         }
     },
@@ -843,7 +843,7 @@ Subscription: {
                 }[]
                 const nuevoPedido = orders[0];
                 pubsub.publish(PEDIDO_CREADO, { pedidoCreado: nuevoPedido });
-            return nuevoPedido;
+                return nuevoPedido;
             } catch (error) {
                 await client.query('ROLLBACK')
                 throw error

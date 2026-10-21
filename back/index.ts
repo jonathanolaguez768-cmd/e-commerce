@@ -3,24 +3,24 @@ import { httpHandler } from '@cypriotunknown/apollo-hono'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
-import { authRouter } from './src/auth/authRouter'
 import { apiRouter } from './src/api/apiRouter'
 import { productosRouter } from './src/api/productos'
+import { authRouter } from './src/auth/authRouter'
 import { getSession } from './src/auth/session'
 import { resolvers } from './src/graphql/resolvers'
 import { typeDefs } from './src/graphql/schema'
 
-import { createServer } from 'node:http'
-import { WebSocketServer } from 'ws'
-import { useServer } from 'graphql-ws/use/ws'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { getRequestListener } from '@hono/node-server'
+import { useServer } from 'graphql-ws/use/ws'
+import { createServer } from 'node:http'
+import { WebSocketServer } from 'ws'
 
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
 const apollo = new ApolloServer({
-schema
+  schema
 })
 
 await apollo.start()
@@ -45,7 +45,7 @@ app.get('/', (c) => {
 
 app.route('/auth', authRouter)
 app.route('/api', apiRouter)
-app.route('/productos',productosRouter)
+app.route('/productos', productosRouter)
 
 const handleGraphql = httpHandler(apollo, {
   context: async ({ honoCtx }) => {
@@ -70,10 +70,17 @@ useServer(
     schema,
     context: async (ctx) => {
       const request = ctx.extra.request
-      const cookieHeader = request.headers.cookie || ''
+      const cookieHeader = request.headers.cookie
+
+      const rawRequest = new Request('http://localhost/graphql', {
+        headers: cookieHeader
+          ? { cookie: cookieHeader }
+          : {},
+      })
 
       const fakeHonoCtx = {
         req: {
+          raw: rawRequest,
           header: (name: string) => {
             if (name.toLowerCase() === 'cookie') {
               return cookieHeader
@@ -84,9 +91,8 @@ useServer(
       }
 
       const user = await getSession(fakeHonoCtx as any)
-      return {
-        user,
-      }
+
+      return { user }
     },
   },
   wsServer,
