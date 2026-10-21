@@ -12,7 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@apollo/client": "^4.3.4",
+    "@apollo/client": "^4.3.5",
     "@astrojs/netlify": "^8.2.7-beta.0",
     "@astrojs/react": "^7.0.0",
     "@netlify/blobs": "^11.1.4",
