@@ -10,6 +10,23 @@ import { PEDIDO_CREADO, pubsub } from './pubsub'
 interface GraphQLContext {
     user: SessionUser | null
 }
+function requireAuth(context: GraphQLContext): SessionUser {
+    if (!context.user) {
+        throw new Error('Unauthenticated')
+    }
+
+    return context.user
+}
+
+function requireAdmin(context: GraphQLContext): SessionUser {
+    const user = requireAuth(context)
+
+    if (user.rol !== 'ADMIN') {
+        throw new Error('Forbidden: admin access required')
+    }
+
+    return user
+}
 
 export const resolvers = {
     Subscription: {
@@ -191,9 +208,7 @@ export const resolvers = {
             args: { id: string },
             context: GraphQLContext,
         ) => {
-            if (!context.user) {
-                throw new Error('Unauthenticated')
-            }
+            const user = requireAuth(context)
 
             const id = Number(args.id)
 
@@ -216,13 +231,18 @@ export const resolvers = {
         WHERE id = $1
           AND usuario_id = $2
         `,
-                [id, context.user.id],
+                [id, user.id],
             )
 
             return rows[0] ?? null
         },
 
-        usuarios: async () => {
+        usuarios: async (
+            _: unknown,
+            __: unknown,
+            context: GraphQLContext,
+        ) => {
+            requireAdmin(context)
             const { rows } = await db.query(`
                 SELECT
                     id,
@@ -238,7 +258,9 @@ export const resolvers = {
         usuario: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context)
             const { rows } = await db.query(
                 `
                 SELECT
@@ -468,7 +490,10 @@ export const resolvers = {
                     categoria_id: string
                 }
             },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
+
             const input = createProductSchema.parse({
                 ...args.input,
                 categoria_id: Number(
@@ -553,7 +578,9 @@ export const resolvers = {
                     categoria_id?: string
                 }
             },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
             const input = updateProductSchema.parse({
                 ...args.input,
                 ...(args.input.categoria_id !==
@@ -671,7 +698,9 @@ export const resolvers = {
         eliminarProducto: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
             const result =
                 await db.query(
                     'DELETE FROM producto WHERE id = $1',
@@ -694,12 +723,11 @@ export const resolvers = {
             },
             context: GraphQLContext
         ) => {
-            if (!context.user) {
-                throw new Error('Unauthenticated')
-            }
+            const user = requireAuth(context)
 
             const input = createOrderSchema.parse(args.input)
-            const userId = context.user.id
+
+            const userId = user.id
 
             const client = await db.connect()
 
