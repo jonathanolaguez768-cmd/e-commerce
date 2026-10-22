@@ -1,16 +1,20 @@
-import { ApolloClient, InMemoryCache, HttpLink, split } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache, split } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { createClient } from 'graphql-ws';
+
+const graphqlUrl = import.meta.env.PUBLIC_GRAPHQL_URL;
+
+const wsUrl = graphqlUrl.replace(/^http/, 'ws');
 
 const httpLink = new HttpLink({
-  uri: 'https://e-commerce-production-b2b5.up.railway.app/graphql',
+  uri: graphqlUrl,
   credentials: 'include',
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: 'wss://e-commerce-production-b2b5.up.railway.app/graphql',
+    url: wsUrl,
   })
 );
 

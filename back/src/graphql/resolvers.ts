@@ -15,12 +15,20 @@ export const resolvers = {
     Subscription: {
         pedidoCreado: {
             subscribe: (_: unknown, __: unknown, context: GraphQLContext) => {
+                console.log(
+                    '[SUBSCRIPTION] Solicitud recibida. Usuario:',
+                    context.user?.id
+                );
+
                 if (!context.user) {
                     throw new Error('No autenticado para esta suscripción');
                 }
+
+                console.log('[SUBSCRIPTION] Escucha activa');
+
                 return pubsub.asyncIterableIterator([PEDIDO_CREADO]);
             },
-        }
+        },
     },
 
     Query: {
@@ -181,33 +189,37 @@ export const resolvers = {
         pedido: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            if (!context.user) {
+                throw new Error('Unauthenticated')
+            }
+
+            const id = Number(args.id)
+
+            if (!Number.isInteger(id) || id <= 0) {
+                throw new Error('Invalid order ID')
+            }
+
             const { rows } = await db.query(
                 `
-                SELECT
-                    id,
-                    TO_CHAR(
-                        fecha,
-                        'YYYY-MM-DD HH24:MI:SS'
-                    ) AS fecha,
-                    total,
-                    status,
-                    usuario_id
-                FROM pedido
-                WHERE id = $1
-                `,
-                [Number(args.id)],
+        SELECT
+            id,
+            TO_CHAR(
+                fecha,
+                'YYYY-MM-DD HH24:MI:SS'
+            ) AS fecha,
+            total,
+            status,
+            usuario_id
+        FROM pedido
+        WHERE id = $1
+          AND usuario_id = $2
+        `,
+                [id, context.user.id],
             )
 
-            const orders = rows as {
-                id: number
-                fecha: string
-                total: number
-                status: string
-                usuario_id: number
-            }[]
-
-            return orders[0] ?? null
+            return rows[0] ?? null
         },
 
         usuarios: async () => {
@@ -682,14 +694,17 @@ export const resolvers = {
             },
             context: GraphQLContext
         ) => {
+            if (!context.user) {
+                throw new Error('Unauthenticated')
+            }
+
             const input = createOrderSchema.parse(args.input)
+            const userId = context.user.id
 
             const client = await db.connect()
 
             try {
                 await client.query('BEGIN')
-
-                const userId = Number(input.usuario_id)
 
                 const { rows: userRows } = await client.query(
                     `
@@ -842,7 +857,11 @@ export const resolvers = {
                     usuario_id: number
                 }[]
                 const nuevoPedido = orders[0];
-                pubsub.publish(PEDIDO_CREADO, { pedidoCreado: nuevoPedido });
+
+                await pubsub.publish(PEDIDO_CREADO, {
+                    pedidoCreado: nuevoPedido,
+                });
+
                 return nuevoPedido;
             } catch (error) {
                 await client.query('ROLLBACK')

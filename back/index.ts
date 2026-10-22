@@ -64,7 +64,13 @@ const wsServer = new WebSocketServer({
   server,
   path: '/graphql',
 })
+wsServer.on('connection', () => {
+  console.log('[WS] Cliente conectado');
+});
 
+wsServer.on('error', (error) => {
+  console.error('[WS] Error del servidor:', error);
+});
 useServer(
   {
     schema,
@@ -91,7 +97,10 @@ useServer(
       }
 
       const user = await getSession(fakeHonoCtx as any)
-
+      console.log(
+        '[WS AUTH]',
+        user ? `Autenticado: ${user.id}` : 'Sin sesión'
+      );
       return { user }
     },
   },

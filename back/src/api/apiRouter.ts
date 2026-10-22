@@ -2,9 +2,9 @@ import { Hono } from 'hono'
 import { MercadoPagoConfig, Order } from 'mercadopago'
 import { createHash } from 'node:crypto'
 import type { PoolClient } from 'pg'
-
 import { getSession } from '../auth/session'
 import { db } from '../db/database'
+import { PEDIDO_CREADO, pubsub } from '../graphql/pubsub'
 import { processOrderSchema } from '../validation/schemas'
 
 export const apiRouter = new Hono()
@@ -422,6 +422,13 @@ async function finishApprovedAttempt(
 
     await client.query('COMMIT')
     transactionOpen = false
+
+    console.log('[STOCK] Pedido recuperado; publicando evento:', orderId)
+
+    await pubsub.publish(PEDIDO_CREADO, {
+      pedidoCreado: { id: orderId },
+    })
+
     return orderId
   } catch (err) {
     if (transactionOpen) await client.query('ROLLBACK').catch(() => { })
@@ -986,7 +993,18 @@ apiRouter.post('/process_order', async (c) => {
     txClient.release()
     client = null
 
-    return c.json({ pedido_id: orderId, mp_order_id: mpOrderId, mp_payment_id: mpPaymentId, status: 'approved' }, 201)
+    console.log('[STOCK] Pedido confirmado; publicando evento:', orderId)
+
+    await pubsub.publish(PEDIDO_CREADO, {
+      pedidoCreado: { id: orderId },
+    })
+
+    return c.json({
+      pedido_id: orderId,
+      mp_order_id: mpOrderId,
+      mp_payment_id: mpPaymentId,
+      status: 'approved',
+    }, 201)
   } catch (err) {
     if (client && transactionOpen) await client.query('ROLLBACK').catch(() => { })
     if (client) client.release()
