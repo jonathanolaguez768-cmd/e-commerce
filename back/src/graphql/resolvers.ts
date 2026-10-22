@@ -6,21 +6,46 @@ import {
 } from '../validation/schemas'
 
 import type { SessionUser } from '../auth/session'
-import { pubsub, PEDIDO_CREADO } from './pubsub'
+import { PEDIDO_CREADO, pubsub } from './pubsub'
 interface GraphQLContext {
     user: SessionUser | null
 }
+function requireAuth(context: GraphQLContext): SessionUser {
+    if (!context.user) {
+        throw new Error('Unauthenticated')
+    }
+
+    return context.user
+}
+
+function requireAdmin(context: GraphQLContext): SessionUser {
+    const user = requireAuth(context)
+
+    if (user.rol !== 'ADMIN') {
+        throw new Error('Forbidden: admin access required')
+    }
+
+    return user
+}
 
 export const resolvers = {
-Subscription: {
+    Subscription: {
         pedidoCreado: {
             subscribe: (_: unknown, __: unknown, context: GraphQLContext) => {
+                console.log(
+                    '[SUBSCRIPTION] Solicitud recibida. Usuario:',
+                    context.user?.id
+                );
+
                 if (!context.user) {
                     throw new Error('No autenticado para esta suscripción');
-                }       
-                return (pubsub as any).asyncIterator([PEDIDO_CREADO]);
+                }
+
+                console.log('[SUBSCRIPTION] Escucha activa');
+
+                return pubsub.asyncIterableIterator([PEDIDO_CREADO]);
             },
-        }
+        },
     },
 
     Query: {
@@ -181,36 +206,43 @@ Subscription: {
         pedido: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            const user = requireAuth(context)
+
+            const id = Number(args.id)
+
+            if (!Number.isInteger(id) || id <= 0) {
+                throw new Error('Invalid order ID')
+            }
+
             const { rows } = await db.query(
                 `
-                SELECT
-                    id,
-                    TO_CHAR(
-                        fecha,
-                        'YYYY-MM-DD HH24:MI:SS'
-                    ) AS fecha,
-                    total,
-                    status,
-                    usuario_id
-                FROM pedido
-                WHERE id = $1
-                `,
-                [Number(args.id)],
+        SELECT
+            id,
+            TO_CHAR(
+                fecha,
+                'YYYY-MM-DD HH24:MI:SS'
+            ) AS fecha,
+            total,
+            status,
+            usuario_id
+        FROM pedido
+        WHERE id = $1
+          AND usuario_id = $2
+        `,
+                [id, user.id],
             )
 
-            const orders = rows as {
-                id: number
-                fecha: string
-                total: number
-                status: string
-                usuario_id: number
-            }[]
-
-            return orders[0] ?? null
+            return rows[0] ?? null
         },
 
-        usuarios: async () => {
+        usuarios: async (
+            _: unknown,
+            __: unknown,
+            context: GraphQLContext,
+        ) => {
+            requireAdmin(context)
             const { rows } = await db.query(`
                 SELECT
                     id,
@@ -226,7 +258,9 @@ Subscription: {
         usuario: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context)
             const { rows } = await db.query(
                 `
                 SELECT
@@ -456,7 +490,10 @@ Subscription: {
                     categoria_id: string
                 }
             },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
+
             const input = createProductSchema.parse({
                 ...args.input,
                 categoria_id: Number(
@@ -541,7 +578,9 @@ Subscription: {
                     categoria_id?: string
                 }
             },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
             const input = updateProductSchema.parse({
                 ...args.input,
                 ...(args.input.categoria_id !==
@@ -659,7 +698,9 @@ Subscription: {
         eliminarProducto: async (
             _: unknown,
             args: { id: string },
+            context: GraphQLContext,
         ) => {
+            requireAdmin(context);
             const result =
                 await db.query(
                     'DELETE FROM producto WHERE id = $1',
@@ -682,14 +723,16 @@ Subscription: {
             },
             context: GraphQLContext
         ) => {
+            const user = requireAuth(context)
+
             const input = createOrderSchema.parse(args.input)
+
+            const userId = user.id
 
             const client = await db.connect()
 
             try {
                 await client.query('BEGIN')
-
-                const userId = Number(input.usuario_id)
 
                 const { rows: userRows } = await client.query(
                     `
@@ -842,8 +885,12 @@ Subscription: {
                     usuario_id: number
                 }[]
                 const nuevoPedido = orders[0];
-                pubsub.publish(PEDIDO_CREADO, { pedidoCreado: nuevoPedido });
-            return nuevoPedido;
+
+                await pubsub.publish(PEDIDO_CREADO, {
+                    pedidoCreado: nuevoPedido,
+                });
+
+                return nuevoPedido;
             } catch (error) {
                 await client.query('ROLLBACK')
                 throw error
