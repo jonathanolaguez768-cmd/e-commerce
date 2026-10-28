@@ -1,13 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import Sidebar from '../components/Sidebar.astro';
-import ProductCard from '../components/ProductCard.astro';
-import LoadMoreButton from '../components/LoadMoreButton.tsx';
-import { getCategories, getProducts } from '../services/graphql';
-import '../styles/Home.css';
-import type { Category } from '../types/category';
-import type { Product } from '../types/product';
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import Sidebar from "../components/Sidebar.astro";
+import ProductCard from "../components/ProductCard.astro";
+import LoadMoreButton from "../components/LoadMoreButton.tsx";
+import { getCategories, getProducts } from "../services/graphql";
+import CatalogLive from "../components/CatalogLive";
+import "../styles/Home.css";
+import type { Category } from "../types/category";
+import type { Product } from "../types/product";
 
 let categories: Category[] = [];
 let products: Product[] = [];
@@ -25,50 +26,50 @@ try {
   nextCursor = productsData.siguienteCursor;
   hasMore = productsData.hayMas;
 } catch (e) {
-  error = e instanceof Error ? e.message : 'Error al cargar el catálogo';
+  error = e instanceof Error ? e.message : "Error al cargar el catálogo";
 }
 ---
 
 <Layout title="Ceti-Verso | Inicio">
   <Hero />
 
-  {error ? (
-    <section class="home__error" style="text-align: center; padding: 40px;">
-      <h2>Error al cargar el catálogo</h2>
-      <p>{error}</p>
-    </section>
-  ) : (
-    <>
-      <div class="home__catalog">
-        <Sidebar categories={categories} />
-
-        <section class="home__main">
-          <h2 style="color: #0062ff;">Productos</h2>
-
-          {products.length === 0 ? (
-            <p>No hay productos disponibles.</p>
-          ) : (
-            <div class="home__products">
-              {products.map((product) => (
-                <ProductCard product={product} />
-              ))}
-
-              <LoadMoreButton 
-                initialCursor={nextCursor} 
-                initialHasMore={hasMore} 
-                client:load 
-              />
-            </div>
-          )}
-        </section>
-      </div>
-
-      <section style="margin-left: 10px; margin-top: 40px;">
-        <h2 style="color: #F47F26;">Context</h2>
-        <p style="color: #fdfdfd;">
-          Explora las diferentes categorías y selecciona un producto para consultar sus detalles.
-        </p>
+  {
+    error ? (
+      <section class="home__error" style="text-align: center; padding: 40px;">
+        <h2>Error al cargar el catálogo</h2>
+        <p>{error}</p>
       </section>
-    </>
-  )}
+    ) : (
+      <>
+        <div class="home__catalog">
+          <Sidebar categories={categories} />
+
+          <section class="home__main">
+            <h2 style="color: #0062ff;">Productos</h2>
+
+            {products.length === 0 ? (
+              <p>No hay productos disponibles.</p>
+            ) : (
+              <div class="home__products">
+                <CatalogLive
+                  initialProducts={products}
+                  initialCursor={nextCursor}
+                  initialHasMore={hasMore}
+                  client:load
+                />
+              </div>
+            )}
+          </section>
+        </div>
+
+        <section style="margin-left: 10px; margin-top: 40px;">
+          <h2 style="color: #F47F26;">Context</h2>
+          <p style="color: #fdfdfd;">
+            Explora las diferentes categorías y selecciona un producto para
+            consultar sus detalles.
+          </p>
+        </section>
+      </>
+    )
+  }
 </Layout>
