@@ -36,6 +36,7 @@ export const typeDefs = `#graphql
     usuario_id: ID!
     usuario: Usuario!
     detalles: [DetallePedido!]!
+    pago: PagoInfo
   }
 
   type DetallePedido {
@@ -114,6 +115,14 @@ export const typeDefs = `#graphql
     ): Pedido!
   }
 
+    type PagoInfo {
+    metodo: String!
+    status: String!
+    ticket_url: String
+    referencia: String
+    expira_en: String
+  }
+    
   type Subscription {
     pedidoCreado: Pedido!
   }

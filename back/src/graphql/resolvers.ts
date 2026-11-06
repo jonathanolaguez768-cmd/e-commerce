@@ -413,6 +413,41 @@ export const resolvers = {
 
             return rows
         },
+        //añadido resolver para pago con oxxo
+        pago: async (
+            pedido: { id: number; usuario_id: number },
+            _: unknown,
+            context: GraphQLContext,
+        ) => {
+            // Solo el dueño del pedido puede ver su ficha.
+            if (
+                !context.user ||
+                Number(context.user.id) !== Number(pedido.usuario_id)
+            ) {
+                return null
+            }
+
+            const { rows } = await db.query(
+                `
+                SELECT
+                    metodo,
+                    status,
+                    ticket_url,
+                    referencia,
+                    TO_CHAR(
+                        expira_en AT TIME ZONE 'UTC',
+                        'YYYY-MM-DD"T"HH24:MI:SS"Z"'
+                    ) AS expira_en
+                FROM pago
+                WHERE pedido_id = $1
+                ORDER BY id DESC
+                LIMIT 1
+                `,
+                [pedido.id],
+            )
+
+            return rows[0] ?? null
+        },
     },
 
     DetallePedido: {

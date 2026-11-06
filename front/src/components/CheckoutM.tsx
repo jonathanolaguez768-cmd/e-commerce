@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { API_URL } from "../config";
+import "../styles/CheckoutOxxo.css";
 import { useCartStore } from "../store/cartStore";
 
 declare global {
@@ -594,9 +595,14 @@ export default function CheckoutComponentM({ publicKey }: Props) {
         // clave de idempotencia aquí: solo se renueva ante un resultado definitivo.
     }, [publicKey, total, cartSignature]);
 
-    return (
+        return (
         <>
-            <h2>Checkout</h2>
+            <div className="checkout-m__header">
+                <h2>Checkout</h2>
+                <a href="/checkout-oxxo" className="checkout-m__oxxo-btn">
+                    Pagar en físico
+                </a>
+            </div>
 
             {paymentError && (
                 <p

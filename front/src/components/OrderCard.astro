@@ -5,11 +5,57 @@ interface Props {
     order: Order;
 }
 const { order } = Astro.props;
+
+const STATUS_LABELS: Record<string, string> = {
+    CONFIRMADO: "Pedido realizado",
+    PENDIENTE_PAGO: "Pendiente de pago",
+    CANCELADO: "Pedido cancelado",
+};
+
+const MX_TZ = "America/Mexico_City";
+
+function formatDeadline(iso: string): string {
+    const date = new Date(iso);
+
+    const time = date.toLocaleTimeString("en-GB", {
+        timeZone: MX_TZ,
+        hour12: false,
+    });
+
+    if (time === "23:59:59") {
+        const day = date.toLocaleDateString("es-MX", {
+            timeZone: MX_TZ,
+            day: "numeric",
+            month: "long",
+        });
+        return `hasta el ${day}`;
+    }
+
+    const day = date.toLocaleDateString("es-MX", {
+        timeZone: MX_TZ,
+        day: "numeric",
+        month: "long",
+    });
+    const hour = date.toLocaleTimeString("es-MX", {
+        timeZone: MX_TZ,
+        hour: "numeric",
+        minute: "2-digit",
+    });
+    return `antes del ${day} a las ${hour}`;
+}
+
+const statusLabel = STATUS_LABELS[order.status] ?? order.status;
+const isPending = order.status === "PENDIENTE_PAGO";
+const ticketUrl = isPending ? order.pago?.ticket_url : null;
+const expiresText =
+    isPending && order.pago?.expira_en
+        ? formatDeadline(order.pago.expira_en)
+        : null;
 ---
 
 <article class="order-card">
     <header class="order-card__header">
-        <div><span>Pedido #{order.id}</span> <h2>Pedido realizado</h2></div>
+        <div><span>Pedido #{order.id}</span> <h2>{statusLabel}</h2></div>
         <strong>${order.total.toFixed(2)}</strong>
     </header>
     <p class="order-card__date">{order.date}</p>
@@ -28,4 +74,24 @@ const { order } = Astro.props;
             ))
         }
     </div>
+    {
+        isPending && (
+            <div class="order-card__pending">
+                <p>
+                    Esperando tu pago en OXXO.
+                    {expiresText && ` Paga ${expiresText}.`}
+                </p>
+                {ticketUrl && (
+                    <a
+                        class="order-card__ticket-btn"
+                        href={ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Ver ficha
+                    </a>
+                )}
+            </div>
+        )
+    }
 </article>
