@@ -1,0 +1,194 @@
+/* ===== Encabezado con el botón "Pagar en físico" (lo usa CheckoutM.tsx) ===== */
+.checkout-m__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.checkout-m__header h2 {
+  margin: 0;
+}
+
+.checkout-m__oxxo-btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #ff5500;
+  color: #ffffff;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.checkout-m__oxxo-btn:hover {
+  background: #e04b00;
+}
+
+/* ===== Formulario de pago en efectivo (CheckoutOxxo.tsx) ===== */
+.oxxo {
+  max-width: 560px;
+  margin: 2rem auto;
+  padding: 24px;
+  background: #1e1e1e;
+  color: #ffffff;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.oxxo h2 {
+  margin: 0 0 8px;
+}
+
+.oxxo__back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #a1a1aa;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.oxxo__back:hover {
+  color: #ffffff;
+}
+
+.oxxo__eyebrow {
+  margin: 0 0 4px;
+  color: #ff5500;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.oxxo__text {
+  margin: 0 0 16px;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+.oxxo__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .oxxo__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.oxxo__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.oxxo__field label {
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.oxxo__field input {
+  padding: 14px;
+  background: #121212;
+  color: #ffffff;
+  border: 1px solid #333333;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.oxxo__field input:focus {
+  outline: none;
+  border-color: #0055ff;
+}
+
+.oxxo__summary {
+  margin: 8px 0 20px;
+  padding: 16px;
+  background: #121212;
+  border-radius: 12px;
+}
+
+.oxxo__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.oxxo__total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #333333;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.oxxo__error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #3a1414;
+  color: #ff8080;
+  border-radius: 12px;
+}
+
+.oxxo__button {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: #ff5500;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.oxxo__button:hover:not(:disabled) {
+  background: #e04b00;
+}
+
+.oxxo__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.oxxo__link {
+  display: block;
+  margin-top: 16px;
+  color: #a1a1aa;
+  text-align: center;
+}
+
+.oxxo__reference {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 16px;
+  background: #121212;
+  border-radius: 12px;
+}
+
+.oxxo__reference span {
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.oxxo__reference strong {
+  font-size: 22px;
+  letter-spacing: 0.05em;
+}

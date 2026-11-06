@@ -325,30 +325,42 @@ export async function getOrders(
   const query = `
     query ObtenerPedidos {
       pedidos {
-    id
-    fecha
-    total
-        detalles {
-      cantidad
-      precio
-          producto {
         id
-        nombre
-        precio
-        imagen
-        stock
-        categoria_id
+        fecha
+        total
+        status
+        pago {
+          ticket_url
+          referencia
+          expira_en
+        }
+        detalles {
+          cantidad
+          precio
+          producto {
+            id
+            nombre
+            precio
+            imagen
+            stock
+            categoria_id
+          }
+        }
       }
     }
-  }
-}
-`
+  `
 
   const data = await fetchGraphQL<{
     pedidos: {
       id: string
       fecha: string
       total: number
+      status: string
+      pago: {
+        ticket_url: string | null
+        referencia: string | null
+        expira_en: string | null
+      } | null
       detalles: {
         cantidad: number
         precio: number
@@ -369,6 +381,8 @@ export async function getOrders(
       id: Number(order.id),
       date: order.fecha,
       total: order.total,
+      status: order.status,
+      pago: order.pago ?? null,
 
       products: order.detalles.map(
         (detalle): Product => ({

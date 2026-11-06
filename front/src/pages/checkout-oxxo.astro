@@ -1,0 +1,9 @@
+---
+// Deja aquí el MISMO import de Layout que usa tu página de checkout actual.
+import Layout from '../layouts/Layout.astro'
+import CheckoutOxxo from '../components/CheckoutOxxo.tsx'
+---
+
+<Layout title="Pagar en OXXO">
+  <CheckoutOxxo client:only="react" />
+</Layout>

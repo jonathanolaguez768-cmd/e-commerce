@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { API_URL } from "../config";
+import "../styles/CheckoutOxxo.css";
 
 declare global {
     interface Window {
@@ -272,9 +273,14 @@ export default function CheckoutComponentM({ publicKey }: Props) {
         };
     }, [publicKey, total, cartSignature]);
 
-    return (
+        return (
         <>
-            <h2>Checkout</h2>
+            <div className="checkout-m__header">
+                <h2>Checkout</h2>
+                <a href="/checkout-oxxo" className="checkout-m__oxxo-btn">
+                    Pagar en físico
+                </a>
+            </div>
 
             {paymentError && (
                 <p
