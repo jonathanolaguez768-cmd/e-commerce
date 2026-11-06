@@ -21,7 +21,7 @@ export default function TopBar() {
     clearUser()
     window.location.href = '/'
   }
-const isAdmin = user && (user.email === 'admin@admin.com')
+  const isAdmin = user && (user.rol === 'ADMIN')
   return (
     <header className="topbar">
       <div className="topbar__content">
@@ -56,7 +56,7 @@ const isAdmin = user && (user.email === 'admin@admin.com')
           {isAdmin && (
             <a href="/admin/dashboard" className="topbar__AD" title="Panel de Administración">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                <path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-5.33 0-16 2.67-16 8v2h32v-2c0-5.33-10.67-8-16-8z"/>
+                <path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 12c-5.33 0-16 2.67-16 8v2h32v-2c0-5.33-10.67-8-16-8z" />
               </svg>
             </a>
           )}
@@ -70,7 +70,7 @@ const isAdmin = user && (user.email === 'admin@admin.com')
               </a>
             </>
           )}
-          
+
         </div>
       </div>
     </header>

@@ -2,16 +2,9 @@
 import CheckoutComponentM from "../components/CheckoutM.tsx";
 import Layout from "../layouts/Layout.astro";
 
-const sid = Astro.cookies.get("sid");
-if (!sid?.value) {
-  return Astro.redirect("/login?redirect=/checkout");
-}
-
 const publicKey = import.meta.env.PUBLIC_MERCADOPAGO_KEY ?? '';
 ---
-
 <Layout title="Checkout | Ceti-Verso">
-  {/* is:inline ensures Astro leaves the CDN script tag untouched */}
   <script is:inline src="https://sdk.mercadopago.com/js/v2"></script>
 
   <CheckoutComponentM client:only="react" publicKey={publicKey} />

@@ -16,19 +16,43 @@ interface Categoria {
   nombre: string
 }
 
-export default function AdminDashboard({ initialUser }: { initialUser: any }) {
+export default function AdminDashboard() {
   const [productos, setProductos] = useState<Producto[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<any>(null)
 
   const [form, setForm] = useState({ nombre: '', precio: '', stock: '', imagen: '', categoria_id: '1' })
   const [editingId, setEditingId] = useState<number | null>(null)
 
+  useEffect(() => {
+    const verifyAuthAndFetch = async () => {
+      try {
+        const resMe = await fetch(`${API_URL}/auth/me`, { credentials: 'include' })
+        if (!resMe.ok) {
+          window.location.href = '/login'
+          return
+        }
+        const userData = await resMe.json()
+        
+        if (userData.rol !== 'ADMIN') {
+          window.location.href = '/'
+          return
+        }
+
+        setUser(userData)
+        await fetchData()
+      } catch (err: any) {
+        window.location.href = '/login'
+      }
+    }
+
+    verifyAuthAndFetch()
+  }, [])
+
   const fetchData = async () => {
     try {
-      setLoading(true)
-
       const resProd = await fetch(`${API_URL}/productos`, { credentials: 'include' })
       if (!resProd.ok) throw new Error('Error al cargar productos')
       const dataProd = await resProd.json()
@@ -60,10 +84,6 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -128,9 +148,9 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
     <main className="admin-page">
       <header className="admin-header">
         <div>
-          <h2 id='title' >Panel de Administrador</h2>
+          <h2 id='title'>Panel de Administrador {user ? `- ${user.nombre}` : ''}</h2>
         </div>
-        <a href="/" className="admin-header__back">Volver a la tienda </a>
+        <a href="/" className="admin-header__back">Volver a la tienda</a>
       </header>
       {error && <div className="admin-error">{error}</div>}
 
@@ -178,7 +198,6 @@ export default function AdminDashboard({ initialUser }: { initialUser: any }) {
                 placeholder="https://..."
               />
             </div>
-            
             
             <div className="admin-form__field">
               <label>Categoría</label>

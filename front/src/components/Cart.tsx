@@ -38,7 +38,7 @@ export default function Cart() {
           <h3>Tu carrito está vacío.</h3>
 
           <p>
-            Explora nuestro catálogo y agrega algunos productos.
+            Para poder agregar productos porfavor inicia sesion o crea una cuenta.
           </p>
 
           <a

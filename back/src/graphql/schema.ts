@@ -122,4 +122,8 @@ export const typeDefs = `#graphql
     referencia: String
     expira_en: String
   }
+    
+  type Subscription {
+    pedidoCreado: Pedido!
+  }
 `
