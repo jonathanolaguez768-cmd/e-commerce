@@ -1,9 +1,10 @@
 import { ResourceTemplate, type McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
+import { sendSupplierEmail } from '../services/email/config'
 import { draftAnOrderResolver } from './resolvers/prompts/draft_an_order'
+import { getProducts } from './resolvers/resources/products'
 import { getSuppliersByProductResolver } from './resolvers/resources/suppliers'
-import { sendSupplierEmailResolver } from './resolvers/tools/send_supplier_email'
 
 export function registerMcpModules(mcpServer: McpServer) {
     mcpServer.registerPrompt(
@@ -53,27 +54,67 @@ export function registerMcpModules(mcpServer: McpServer) {
         }
     )
 
-    mcpServer.registerTool(
-        'send_supplier_email',
+    mcpServer.registerResource(
+        'products',
+        new ResourceTemplate('ecommerce://products', { list: undefined }),
         {
-            description: 'Sends a purchase order email to a supplier by looking up their contact email internally.',
+            description: 'Returns all registered products.'
+        },
+        async (uri, { }) => {
+            const products = await getProducts()
+
+            return {
+                contents: [
+                    {
+                        uri: uri.href,
+                        text: JSON.stringify(products, null, 2),
+                        mimeType: 'application/json'
+                    }
+                ]
+            }
+        }
+    )
+
+    mcpServer.registerTool(
+        "send_supplier_email",
+        {
+            description:
+                "Sends a purchase order email to a supplier by looking up their contact email internally.",
+
             inputSchema: {
-                supplierName: z.string().describe('Exact name of the selected supplier'),
-                product: z.string().describe('Product name or SKU'),
-                quantity: z.number().describe('Quantity of units to order')
+                supplierName: z.string()
+                    .describe("Exact name of the selected supplier"),
+
+                email_body: z.string()
+                    .describe("The content of the email to be sent"),
+
+                products: z.array(
+                    z.object({
+                        name: z.string()
+                            .describe("Product name"),
+
+                        quantity: z.number()
+                            .int()
+                            .positive()
+                            .describe("Quantity of units to order")
+                    })
+                ).min(1)
+                    .describe("List of products and their quantities")
             }
         },
-        async ({ supplierName, product, quantity }) => {
-            const resultMessage = await sendSupplierEmailResolver({
+
+        async ({ supplierName, email_body, products }) => {
+
+            const resultMessage = await sendSupplierEmail.execute({
                 supplierName,
-                product,
-                quantity
+                email_body,
+                products
             })
 
             return {
                 content: [
                     {
-                        type: 'text',
+                        type: "text",
                         text: resultMessage
                     }
                 ]
