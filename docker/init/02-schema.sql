@@ -55,17 +55,14 @@ CREATE TABLE detalle_pedido (
 );
 
 -- Grant table-level privileges to app role
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO p26_app;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO p26_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO cetiverso_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO cetiverso_app;
 
 -- Seed data
 INSERT INTO categoria (id, nombre) VALUES
 (1, 'Pins'),
 (2, 'Stickers');
 
-INSERT INTO usuario (id, nombre, email, rol) VALUES
-(1, 'Usuario Demo', 'demo@example.com', 'USER'),
-(2, 'Administrador', 'admin@example.com', 'ADMIN');
 
 INSERT INTO producto
     (id, nombre, precio, imagen, stock, categoria_id)
