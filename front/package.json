@@ -23,6 +23,7 @@
     "graphql-ws": "^6.4.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "rxjs": "^7.8.2",
     "zustand": "^5.0.15"
   },
   "allowScripts": {
