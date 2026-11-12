@@ -17,3 +17,5 @@ front/package-lock.json
 #Jona
 Levantar.md
 Plantilla.md
+docker/init/01-role.sql
+back/src/db/database.ts
