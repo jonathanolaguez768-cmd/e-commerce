@@ -1,3 +1,6 @@
+.vscode
+local
+
 # Dependencias
 node_modules/
 dist/

@@ -1,3 +1,4 @@
+
 -- Role enum type
 CREATE TYPE rol_enum AS ENUM ('USER', 'ADMIN');
 
@@ -63,7 +64,6 @@ INSERT INTO categoria (id, nombre) VALUES
 (1, 'Pins'),
 (2, 'Stickers');
 
-
 INSERT INTO producto
     (id, nombre, precio, imagen, stock, categoria_id)
 VALUES
@@ -92,3 +92,11 @@ VALUES
 SELECT setval('categoria_id_seq', (SELECT MAX(id) FROM categoria));
 SELECT setval('usuario_id_seq',   (SELECT MAX(id) FROM usuario));
 SELECT setval('producto_id_seq',  (SELECT MAX(id) FROM producto));
+
+-- Default privileges for future tables and sequences
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+GRANT ALL PRIVILEGES ON TABLES TO cetiverso_app;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+GRANT ALL PRIVILEGES ON SEQUENCES TO cetiverso_app;
+GRANT USAGE ON SCHEMA public TO cetiverso_app;
