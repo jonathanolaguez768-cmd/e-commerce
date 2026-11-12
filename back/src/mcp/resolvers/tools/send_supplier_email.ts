@@ -1,25 +1,17 @@
-import { db } from "../../../db/database"
+import { sendSupplierEmail } from "../../../services/email/config"
 
-export async function sendSupplierEmailResolver(params: {
+interface SendSupplierEmailParams {
     supplierName: string
-    product: string
-    quantity: number
-}): Promise<string> {
-    const query = `
-    SELECT email
-    FROM proveedor
-    WHERE LOWER(nombre) = LOWER($1)
-    LIMIT 1
-  `
-    const result = await db.query(query, [params.supplierName.trim()])
+    email_body: string
+    products: {
+        name: string
+        quantity: number
+    }[]
+}
 
-    if (result.rows.length === 0) {
-        throw new Error(`El proveedor "${params.supplierName}" no existe en la base de datos.`)
-    }
+export async function sendSupplierEmailResolver(
+    params: SendSupplierEmailParams
+): Promise<string> {
 
-    const recipientEmail = result.rows[0].email
-
-    // TODO: Email logic
-
-    return `Orden de compra enviada exitosamente a "${params.supplierName}" (${recipientEmail}) por ${params.quantity} unidades del producto "${params.product}".`
+    return await sendSupplierEmail.execute(params)
 }

@@ -1,10 +1,10 @@
 import { ResourceTemplate, type McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
-import { sendSupplierEmail } from '../services/email/config'
 import { draftAnOrderResolver } from './resolvers/prompts/draft_an_order'
 import { getProducts } from './resolvers/resources/products'
 import { getSuppliersByProductResolver } from './resolvers/resources/suppliers'
+import { sendSupplierEmailResolver } from './resolvers/tools/send_supplier_email'
 
 export function registerMcpModules(mcpServer: McpServer) {
     mcpServer.registerPrompt(
@@ -78,8 +78,7 @@ export function registerMcpModules(mcpServer: McpServer) {
     mcpServer.registerTool(
         "send_supplier_email",
         {
-            description:
-                "Sends a purchase order email to a supplier by looking up their contact email internally.",
+            description: "Sends a purchase order email to a supplier by looking up their contact email internally.",
 
             inputSchema: {
                 supplierName: z.string()
@@ -105,7 +104,7 @@ export function registerMcpModules(mcpServer: McpServer) {
 
         async ({ supplierName, email_body, products }) => {
 
-            const resultMessage = await sendSupplierEmail.execute({
+            const resultMessage = await sendSupplierEmailResolver({
                 supplierName,
                 email_body,
                 products
