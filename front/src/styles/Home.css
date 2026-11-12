@@ -24,6 +24,7 @@
   font-size: 28px;
   font-weight: 900;
   letter-spacing: -0.04em;
+  
 }
 
 @media (max-width: 1000px) {
@@ -146,7 +147,8 @@
   border-radius: 10px;
   border: 1px solid #F47F26;
   background: #F47F26;
-  color: #ffffff;
+  color: #000000;
+  font-weight: bold;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -162,5 +164,8 @@
 }
 
 .home__load-more button:disabled {
-  opacity: 0.5;
+  background: #e5e7eb; 
+  color: #9ca3af;     
+  opacity: 1;         
+  cursor: not-allowed;
 }

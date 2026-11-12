@@ -4,6 +4,7 @@
 //import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 
 export default defineConfig({
     output: 'server',
@@ -14,5 +15,8 @@ export default defineConfig({
          //   edgeFunctions: false,
         //},
     //}),
+     adapter: node({
+    mode: 'standalone',
+  }),
     integrations: [react()],
 });

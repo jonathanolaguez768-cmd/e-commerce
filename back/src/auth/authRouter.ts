@@ -94,7 +94,7 @@ authRouter.post('/logout', async (c) => {
 authRouter.get('/me', async (c) => {
   const user = await getSession(c)
   if (!user) {
-    return c.json({ error: 'unauthenticated' }, 401)
+    return c.json(null, 200)
   }
   return c.json(user)
 })

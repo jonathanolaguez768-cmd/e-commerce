@@ -153,7 +153,7 @@ export default function ProductDetail({
 
           {availableToAdd > 0 && (
             <label className="product-detail__quantity">
-              <span>Cantidad</span>
+              <span style={{ color:' #ffffff'}}>Cantidad</span>
               <input
                 type="number"
                 min="1"

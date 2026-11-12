@@ -4,15 +4,22 @@ import './ProductCard.css';
 
 interface Props {
   product: Product;
+  priority?: boolean;
 }
 
-const { product } = Astro.props;
+const { product, priority = false } = Astro.props;
 const isOutOfStock = product.stock === 0;
 ---
 <article class="product-card">
   <a href={isOutOfStock ? '#' : `/product/${product.id}`} class="product-card__image-button">
     <div class="product-card__image-wrapper">
-      <img src={product.image} alt={product.name} class="product-card__image" />
+      <img 
+        src={product.image} 
+        alt={product.name} 
+        class="product-card__image"
+        loading={priority ? "eager" : "lazy"}
+        fetchpriority={priority ? "high" : "auto"}
+      />
       {isOutOfStock && <span class="product-card__sold-out">AGOTADO</span>}
     </div>
   </a>

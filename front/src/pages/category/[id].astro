@@ -58,8 +58,8 @@ if (categoryId) {
           </section>
         ) : (
           <div class="category-detail__products">
-            {category.products.map((product) => (
-              <ProductCard product={product} />
+            {category.products.map((product, index) => (
+              <ProductCard product={product} priority={index === 0} />
             ))}
           </div>
         )}

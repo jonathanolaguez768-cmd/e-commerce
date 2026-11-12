@@ -106,7 +106,7 @@ color: #30ef3a;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #0062ff;
+  color: #ffffff;
   margin-top: 28px;
   font-size: 20px;
   font-weight: 700;
@@ -147,7 +147,8 @@ color: #30ef3a;
   border: 1px solid #F47F26;
   background: #F47F26;
 
-  color: #ffffff;
+  color: #000000;
+  font-style: bold;
 
   font-size: 12px;
   font-weight: 800;
