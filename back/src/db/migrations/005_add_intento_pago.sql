@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS public.intento_pago (
         )
     ),
     error_code VARCHAR(60),
-
     total_amount NUMERIC(10,2),
     payer_email VARCHAR(150),
     order_snapshot JSONB,
@@ -41,5 +40,3 @@ CREATE INDEX IF NOT EXISTS intento_pago_usuario_created_idx
 CREATE INDEX IF NOT EXISTS intento_pago_mp_order_idx
     ON public.intento_pago (mp_order_id)
     WHERE mp_order_id IS NOT NULL;
-
-GRANT SELECT, INSERT, UPDATE ON TABLE public.intento_pago TO p26_app;

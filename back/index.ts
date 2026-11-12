@@ -16,6 +16,10 @@ import { useServer } from 'graphql-ws/use/ws'
 import { createServer } from 'node:http'
 import { WebSocketServer } from 'ws'
 
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js'
+import { registerMcpModules } from './src/mcp/register'
+
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 
@@ -25,11 +29,20 @@ const apollo = new ApolloServer({
 
 await apollo.start()
 
+function createMcpServer() {
+  const mcpServer = new McpServer({
+    name: 'mcp-server',
+    version: '1.0.0'
+  })
+
+  registerMcpModules(mcpServer)
+
+  return mcpServer
+}
+
 const app = new Hono()
 
-const corsOrigins = (process.env.CORS_ORIGINS || 'http://localhost:4321,http://localhost:5173')
-  .split(',')
-  .map((o) => o.trim())
+const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map((o) => o.trim())
 
 app.use(
   '*',
@@ -46,6 +59,26 @@ app.get('/', (c) => {
 app.route('/auth', authRouter)
 app.route('/api', apiRouter)
 app.route('/productos', productosRouter)
+
+const AS_MCP = process.env.AS_MCP
+
+app.all('/mcp*', async (c) => {
+  const authHeader = c.req.header('x-admin-token')
+  const isTokenAdmin = authHeader === AS_MCP
+
+  if (!isTokenAdmin) {
+    return c.json(
+      { error: 'Denied access. Credentials required.' },
+      403
+    )
+  }
+
+  const mcpServer = createMcpServer()
+  const transport = new WebStandardStreamableHTTPServerTransport()
+  await mcpServer.connect(transport)
+
+  return transport.handleRequest(c.req.raw)
+})
 
 const handleGraphql = httpHandler(apollo, {
   context: async ({ honoCtx }) => {
@@ -110,4 +143,5 @@ useServer(
 const port = Number(process.env.PORT) || 4000
 server.listen(port, () => {
   console.log(`Servidor HTTP y WebSockets http://localhost:${port}/graphql`)
+  console.log(`Servidor MCP http://localhost:${port}/mcp`)
 })
