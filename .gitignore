@@ -1,9 +1,15 @@
-local/
-**/node_modules/
-.vscode/
-README.md
-.b*
+# Dependencias
+node_modules/
+dist/
+.astro/
+
+# Variables de entorno y credenciales
 .env
-.env.production
-Reporte_23300714_7D.md
-Reporte-23300714_7D.md
+.env.*
+
+# Logs y cachés
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+front/package-lock.json
