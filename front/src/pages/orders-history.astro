@@ -1,40 +1,12 @@
+
 ---
-import OrderCard from "../components/OrderCard.astro";
-import Layout from "../layouts/Layout.astro";
-import { getOrders } from "../services/graphql";
-import '../styles/history.css'
-
-let orders = null;
-
-try {
-    const cookie = Astro.request.headers.get("cookie");
-
-    orders = await getOrders(cookie ?? undefined);
-    console.log(orders);
-} catch (e) {
-    console.error("Error al obtener los pedidos:", e);
-}
+import OrderHistory from '../components/OrderHistory';
+import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Pedidos | Ceti-Verso">
-    <main class="orders-container">
-        <header class="orders-header">
-            <h1>Mis pedidos</h1>
-            <p class="orders-subtitle">Revisa el historial y estado de tus compras</p>
-        </header>
-        {
-            orders && orders.length > 0 ? (
-                <section>
-                    {orders.map((order) => (
-                        <OrderCard order={order} />
-                    ))}
-                </section>
-            ) : (
-                <div class="empty-orders">
-                    <p class="empty-title">Aún no tienes pedidos registrados</p>
-                    <p class="empty-text">Explora la tienda y realiza tu primera compra.</p>
-                </div>
-            )
-        }
-    </main>
+<Layout
+    title="Pedidos | Ceti-Verso"
+    description="Consulta el historial de tus compras en Ceti-Verso."
+>
+    <OrderHistory client:load />
 </Layout>

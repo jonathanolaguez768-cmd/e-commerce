@@ -1,11 +1,9 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import CatalogLive from "../components/CatalogLive";
 import Hero from "../components/Hero.astro";
 import Sidebar from "../components/Sidebar.astro";
-import ProductCard from "../components/ProductCard.astro";
-import LoadMoreButton from "../components/LoadMoreButton.tsx";
+import Layout from "../layouts/Layout.astro";
 import { getCategories, getProducts } from "../services/graphql";
-import CatalogLive from "../components/CatalogLive";
 import "../styles/Home.css";
 import type { Category } from "../types/category";
 import type { Product } from "../types/product";
@@ -30,7 +28,10 @@ try {
 }
 ---
 
-<Layout title="Ceti-Verso | Inicio">
+<Layout
+  title="Ceti-Verso | Tienda en línea"
+  description="Explora el catálogo de Ceti-Verso, descubre productos y encuentra lo que buscas."
+>
   <Hero />
 
   {

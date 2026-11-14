@@ -1,32 +1,56 @@
 ---
-import TopBar from '../components/TopBar.tsx';
 import Footer from '../components/Footer.astro';
+import TopBar from '../components/TopBar.tsx';
 import '../styles/index.css';
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = 'Ceti-Verso | Tienda' } = Astro.props;
+const {
+  title = 'Ceti-Verso | Tienda',
+  description = 'Descubre productos, explora categorías y compra en Ceti-Verso.'
+} = Astro.props;
 ---
 
-<!xhtml>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content={description} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+
+    <meta name="theme-color" content="#ffffff" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).toString()} />
+
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).toString()} />
+
     <title>{title}</title>
   </head>
+
   <body>
     <TopBar client:load />
+
     <main>
       <slot />
     </main>
+
     <Footer />
+
     <script>
-      import { useAuthStore } from '../store/authStore'
       import { API_URL } from '../config'
+import { useAuthStore } from '../store/authStore'
+
       fetch(`${API_URL}/auth/me`, { credentials: 'include' })
         .then((res) => (res.ok ? res.json() : null))
         .then((user) => {

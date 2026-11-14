@@ -113,7 +113,7 @@ export default function ProductDetail({
   };
 
   return (
-    <main className="product-detail">
+    <div className="product-detail">
       <a href="/" className="product-detail__back">
         ← Volver
       </a>
@@ -122,15 +122,20 @@ export default function ProductDetail({
         <div className="product-detail__image-wrapper">
           <img
             src={product.image}
-            alt={product.name}
+            alt={`Imagen de ${product.name}`}
             className="product-detail__image"
+            width="600"
+            height="600"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
         </div>
 
         <div className="product-detail__info">
           <p className="product-detail__eyebrow">PRODUCTO</p>
 
-          <h2>{product.name}</h2>
+          <h1>{product.name}</h1>
 
           <p className="product-detail__price">
             ${product.price.toFixed(2)}
@@ -152,9 +157,10 @@ export default function ProductDetail({
           </div>
 
           {availableToAdd > 0 && (
-            <label className="product-detail__quantity">
+            <label className="product-detail__quantity" htmlFor="product-quantity">
               <span>Cantidad</span>
               <input
+                id="product-quantity"
                 type="number"
                 min="1"
                 max={availableToAdd}
@@ -193,6 +199,6 @@ export default function ProductDetail({
           </button>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+
 ---
 import type { Product } from '../types/product';
 import './ProductCard.css';
@@ -9,13 +10,42 @@ interface Props {
 const { product } = Astro.props;
 const isOutOfStock = product.stock === 0;
 ---
+
 <article class="product-card">
-  <a href={isOutOfStock ? '#' : `/product/${product.id}`} class="product-card__image-button">
-    <div class="product-card__image-wrapper">
-      <img src={product.image} alt={product.name} class="product-card__image" />
-      {isOutOfStock && <span class="product-card__sold-out">AGOTADO</span>}
+  {isOutOfStock ? (
+    <div class="product-card__image-button">
+      <div class="product-card__image-wrapper">
+        <img
+          src={product.image}
+          alt={product.name}
+          class="product-card__image"
+          width="600"
+          height="600"
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="product-card__sold-out">AGOTADO</span>
+      </div>
     </div>
-  </a>
+  ) : (
+    <a
+      href={`/product/${product.id}`}
+      class="product-card__image-button"
+      aria-label={`Ver detalles de ${product.name}`}
+    >
+      <div class="product-card__image-wrapper">
+        <img
+          src={product.image}
+          alt={product.name}
+          class="product-card__image"
+          width="600"
+          height="600"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </a>
+  )}
 
   <div class="product-card__info">
     <div>
@@ -23,12 +53,17 @@ const isOutOfStock = product.stock === 0;
       <p>${product.price.toFixed(2)}</p>
     </div>
 
-    <a
-      href={isOutOfStock ? '#' : `/product/${product.id}`}
-      class="product-card__button"
-      style={isOutOfStock ? 'pointer-events: none; opacity: 0.6;' : ''}
-    >
-      {isOutOfStock ? 'Agotado' : 'Ver producto'}
-    </a>
+    {isOutOfStock ? (
+      <span class="product-card__button product-card__button--disabled">
+        Agotado
+      </span>
+    ) : (
+      <a
+        href={`/product/${product.id}`}
+        class="product-card__button"
+      >
+        Ver producto
+      </a>
+    )}
   </div>
 </article>

@@ -1,31 +1,61 @@
+
 ---
-export const prerender = false;
-import Layout from '../../layouts/Layout.astro';
 import ProductDetail from '../../components/ProductDetail.tsx';
-import { getProductById } from '../../services/graphql';
+import Layout from '../../layouts/Layout.astro';
+import { getCategories } from '../../services/graphql';
+import type { Product } from '../../types/product';
 
-const { id } = Astro.params;
-const productId = Number(id);
+export async function getStaticPaths() {
+  const categories = await getCategories();
 
-let product = null;
+  // Obtener todos los productos y evitar duplicados.
+  const products = categories.flatMap(
+    (category) => category.products,
+  );
 
-if (productId) {
-  try {
-    product = await getProductById(productId);
-  } catch (e) {
-    console.error('Error al obtener producto:', e);
-  }
+  const uniqueProducts = [
+    ...new Map(
+      products.map((product) => [product.id, product]),
+    ).values(),
+  ];
+
+  return uniqueProducts.map((product) => ({
+    params: { id: String(product.id) },
+    props: { product },
+  }));
 }
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
 ---
 
-<Layout title={product ? `${product.name} | Ceti-Verso` : 'Producto no encontrado'}>
-  {product ? (
-    <ProductDetail client:load product={product} />
-  ) : (
-    <main style="text-align: center; padding: 100px 20px;">
-      <a href="/" style="color: #ffffff; text-decoration: underline;">← Volver al inicio</a>
-      <h2 style="color: #F47F26; margin-top: 20px;">Producto no encontrado</h2>
-      <p style="color: #ffffff;">El producto que buscas no existe o fue removido.</p>
-    </main>
-  )}
+<Layout
+  title={`${product.name} | Ceti-Verso`}
+  description={`Conoce ${product.name}, consulta sus características y disponibilidad en Ceti-Verso.`}
+>
+  <ProductDetail client:load product={product} />
+
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      image: [product.image],
+      description: `Conoce ${product.name} en Ceti-Verso.`,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'MXN',
+        price: product.price,
+        availability:
+          product.stock > 0
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+        url: Astro.url.href,
+      },
+    }).replace(/</g, '\\u003c')}/>
 </Layout>

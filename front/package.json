@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@apollo/client": "^4.3.5",
-    "@astrojs/netlify": "^6.2.2",
     "@astrojs/react": "^7.1.4",
+    "@astrojs/sitemap": "^3.7.5",
     "@netlify/blobs": "^11.1.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

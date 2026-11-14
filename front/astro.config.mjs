@@ -1,18 +1,19 @@
-
-// @ts-check
-
-//import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-    output: 'server',
-  //  adapter: netlify({
-    //    devFeatures: {
-      //      environmentVariables: true,
-        //    images: true,
-         //   edgeFunctions: false,
-        //},
-    //}),
-    integrations: [react()],
+  site: 'http://localhost:4321/',
+  output: 'static',
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) =>
+        !page.includes('/admin') &&
+        !page.includes('/register') &&
+        !page.includes('/login') &&
+        !page.includes('/cart') &&
+        !page.includes('/orders-history'),
+    }),
+  ],
 });

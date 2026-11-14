@@ -23,12 +23,12 @@
   border: 0;
   background: transparent;
   color: #fbfbfb;
-  font-size: 20px; 
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.05em;
   cursor: pointer;
   text-transform: uppercase;
-  white-space: nowrap; 
+  white-space: nowrap;
   transition: opacity 0.2s ease;
 }
 
@@ -39,7 +39,7 @@
 .topbar__nav {
   display: flex;
   align-items: center;
-  gap: 70px; 
+  gap: 70px;
 }
 
 .topbar__cart {
@@ -184,5 +184,21 @@
   .topbar__cart {
     min-width: auto;
     padding: 8px 12px;
+  }
+}
+
+.topbar a:focus-visible,
+.topbar button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .topbar *,
+  .topbar *::before,
+  .topbar *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

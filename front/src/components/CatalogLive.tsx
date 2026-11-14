@@ -128,6 +128,10 @@ export default function CatalogLive({
                                     src={product.image}
                                     alt={product.name}
                                     className="product-card__image"
+                                    width="600"
+                                    height="600"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 {isOutOfStock && (
                                     <span className="product-card__sold-out">

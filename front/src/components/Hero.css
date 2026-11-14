@@ -4,10 +4,11 @@
     margin: 32px auto 64px;
     display: flex;
     align-items: flex-end;
-    background:
-    linear-gradient(135deg,
-     #ff6200 35%,
-     #005df4 0%);
+
+    background: linear-gradient(135deg,
+            #ff6200 35%,
+            #005df4 0%);
+
     color: #ffffff;
 }
 
@@ -18,24 +19,24 @@
 
 .hero__eyebrow {
     margin: 0 0 20px;
-
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.16em;
 }
 
-.hero h2 {
+.hero h1 {
     margin: 0;
     font-size: clamp(42px, 6vw, 76px);
     line-height: 0.95;
     letter-spacing: -0.055em;
     font-weight: 900;
+    color: #ffffff;
 }
 
 .hero__description {
     max-width: 500px;
     margin: 28px 0 0;
-    color: #d3cece;
+    color: #ffffff;
     font-size: 19px;
     line-height: 1.6;
 }
@@ -51,7 +52,15 @@
         padding: 32px;
     }
 
-    .hero h2 {
+    .hero h1 {
         font-size: 46px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero * {
+        scroll-behavior: auto;
+        animation: none !important;
+        transition: none !important;
     }
 }
